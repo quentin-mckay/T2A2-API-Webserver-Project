@@ -4,8 +4,16 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
     
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+
+
+
+    # comments = db.relationship(
+    #     "Comment",
+    #     backref="card",
+    #     cascade="all, delete"
+    # )
 
     def __repr__(self):
         project_content = self.content[:10] + '...'

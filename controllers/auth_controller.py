@@ -23,20 +23,20 @@ def register():
     # print(type(request.json))
     # print(type(user_fields))
     
-    email = user_fields['email']
-    user = User.query.filter_by(email=email).first() # returns None if didn't find anything
+    username = user_fields['username']
+    user = User.query.filter_by(username=username).first() # returns None if didn't find anything
     
     if user:
-        print('Email already exists. Aborting.')
+        print('Username already exists. Aborting.')
         
         # this is CA example
         # return abort(400, description="Email alread registered") # sends Content-Type: text/html
         
         # planetary does following (sends json)
-        return jsonify(message="That email already exists."), 409 # Conflict
+        return jsonify(message="That username already exists."), 409 # Conflict
 
     new_user = User(
-        email=user_fields['email'],
+        username=user_fields['username'],
         password=user_fields['password']
     )
     

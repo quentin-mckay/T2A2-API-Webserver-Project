@@ -7,7 +7,8 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         
-    projects = fields.List(fields.Nested("ProjectSchema"))
+    # not sure I need this
+    projects = fields.List(fields.Nested("ProjectSchema"), exclude=("user",))
         
 
 user_schema = UserSchema()

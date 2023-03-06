@@ -28,7 +28,7 @@ def seed_db():
     # db.session.add(admin_user)
 
     user1 = User(
-        email = "user1@email.com",
+        username = "Quentin",
         # password = bcrypt.generate_password_hash("123456").decode("utf-8")
         password = '5678',
         admin = True
@@ -36,14 +36,14 @@ def seed_db():
     db.session.add(user1)
     
     user2 = User(
-        email = "user2@email.com",
+        username = "Laura",
         # password = bcrypt.generate_password_hash("123456").decode("utf-8")
         password = 'ghjk'
     )
     db.session.add(user2)
     
     user3 = User(
-        email = "user3@email.com",
+        username = "Tino",
         # password = bcrypt.generate_password_hash("123456").decode("utf-8")
         password = 'fgjthdf'
     )

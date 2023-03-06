@@ -13,13 +13,13 @@ projects = Blueprint("projects", __name__, url_prefix="/projects")
 
 
 @projects.get('/')
-def get_users():
+def get_all_projects():
     project_list = Project.query.all() # User.all() did not work (flask-marshmallow docs are wrong)
     return projects_schema.dump(project_list) # 
 
 
 @projects.get('/<int:id>')
-def get_user_projects(id: int):
+def get_project(id: int):
     project = Project.query.filter_by(id=id).first()
     return project_schema.dump(project)
     
