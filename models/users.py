@@ -6,10 +6,10 @@ class User(db.Model):
     password = db.Column(db.String(), nullable=False)
     admin = db.Column(db.Boolean(), default=False)
     
-    # backref='user' creates column in the Note model used for querying
+    # backref='user' creates column in the Project model used for querying
 	# ex: quentin = User(email="asdf@gmail.com", password="1234")
-    # ex: note = Note(content="I am a note", owner=quentin)
-    notes = db.relationship('Note', backref='user')
+    # ex: project = Project(content="I am a project", owner=quentin)
+    projects = db.relationship('Project', backref='user')
     
     def __repr__(self):
         return f'<User {self.id} {self.email}>'

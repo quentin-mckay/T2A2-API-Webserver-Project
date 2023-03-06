@@ -5,7 +5,7 @@ from main import db
 
 from models.users import User
 from schemas.user_schema import user_schema, users_schema
-from schemas.note_schema import note_schema, notes_schema
+from schemas.project_schema import project_schema, projects_schema
 
 
 users = Blueprint("users", __name__, url_prefix="/users")
@@ -26,8 +26,8 @@ def get_user(id: int):
     return user_schema.dump(user)
 
 
-@users.get('/<int:id>/notes')
-def get_user_notes(id: int):
+@users.get('/<int:id>/projects')
+def get_user_projects(id: int):
     user = User.query.filter_by(id=id).first()
-    notes = user.notes
-    return notes_schema.dump(notes)
+    projects = user.projects
+    return projects_schema.dump(projects)

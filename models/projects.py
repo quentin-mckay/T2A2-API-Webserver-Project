@@ -1,6 +1,6 @@
 from main import db
 
-class Note(db.Model):
+class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
     
@@ -8,5 +8,5 @@ class Note(db.Model):
 
 
     def __repr__(self):
-        note_content = self.content[:10] + '...'
-        return f'<Note {self.id} {note_content}>'
+        project_content = self.content[:10] + '...'
+        return f'<Project {self.id} {project_content}>'

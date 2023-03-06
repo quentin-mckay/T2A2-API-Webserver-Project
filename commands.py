@@ -3,7 +3,7 @@ from flask import Blueprint
 from main import db
 
 from models.users import User
-from models.notes import Note
+from models.projects import Project
 
 
 db_commands = Blueprint("db", __name__)
@@ -19,18 +19,19 @@ def create_db():
 @db_commands.cli.command("seed")
 def seed_db():
     #Create the users first
-    admin_user = User(
-        email = "admin@email.com",
-        # password = bcrypt.generate_password_hash("password123").decode("utf-8"),
-        password = '1234',
-        admin = True
-    )
-    db.session.add(admin_user)
+    # admin_user = User(
+    #     email = "admin@email.com",
+    #     # password = bcrypt.generate_password_hash("password123").decode("utf-8"),
+    #     password = '1234',
+    #     admin = True
+    # )
+    # db.session.add(admin_user)
 
     user1 = User(
         email = "user1@email.com",
         # password = bcrypt.generate_password_hash("123456").decode("utf-8")
-        password = '5678'
+        password = '5678',
+        admin = True
     )
     db.session.add(user1)
     
@@ -41,7 +42,12 @@ def seed_db():
     )
     db.session.add(user2)
     
-    
+    user3 = User(
+        email = "user3@email.com",
+        # password = bcrypt.generate_password_hash("123456").decode("utf-8")
+        password = 'fgjthdf'
+    )
+    db.session.add(user3)
     
     
     # This extra commit will end the transaction and generate the ids for the user
@@ -50,19 +56,20 @@ def seed_db():
     
     
     
-    note1 = Note(
-        content = "This is the very first note",
+    project1 = Project(
+        content = "This is the very first project",
         user = user1
     )
-    note2 = Note(
-        content = "This is the second note",
+    project2 = Project(
+        content = "This is the second project",
         user = user1
     )
-    note3 = Note(
-        content = "This is the second note",
+    
+    project3 = Project(
+        content = "This is the second project",
         user = user2
     )
-    db.session.add_all([note1, note2, note3])
+    db.session.add_all([project1, project2, project3])
     db.session.commit()
 
 

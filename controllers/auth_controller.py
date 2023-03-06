@@ -82,3 +82,8 @@ def login():
     
     # from planetary
     return jsonify(message="Login succeeded!", access_token=access_token), 200
+
+@auth.route('/test', methods=['POST'])
+def test():
+    print(request)
+    return jsonify(message= 'hello', access_token=1234)

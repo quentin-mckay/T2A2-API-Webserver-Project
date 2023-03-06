@@ -14,9 +14,12 @@ cors = CORS()
 def create_app():
     
     app = Flask(__name__)
-    cors.init_app(app, resources={r"/*": {"origins": "*", "methods": "*"}})
     
-    # cors = CORS(app, resources={r"/*": {"origins": "*"}})
+    # still wouldn't allow post requests without preflight(?) stuff
+    # cors.init_app(app, resources={r"/*": {"origins": "*", "methods": "*"}})
+    
+    cors.init_app(app)
+    # CORS(app) # this worked too
     
     app.config.from_object('config.app_config')
     

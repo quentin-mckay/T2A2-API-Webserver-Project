@@ -7,7 +7,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         
-    notes = fields.List(fields.Nested("NoteSchema"))
+    projects = fields.List(fields.Nested("ProjectSchema"))
         
 
 user_schema = UserSchema()

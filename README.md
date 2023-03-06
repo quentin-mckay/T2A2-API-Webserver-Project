@@ -1,6 +1,5 @@
 `source venv/bin/activate`
 
-
 `flask run`
 
 
@@ -19,10 +18,15 @@ I couldn't create tables with `flask db create` until I also run
 GRANT ALL PRIVILEGES ON SCHEMA public TO db_dev;
 
 
+
 Note model needed to be written and `flask db create` before adding relationships? maybe?
 
 
 `select * from "user";`
+
+
+
+
 
 
 ## Auth

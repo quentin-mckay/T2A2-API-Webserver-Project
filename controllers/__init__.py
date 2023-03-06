@@ -1,9 +1,9 @@
 from controllers.auth_controller import auth
 from controllers.users_controller import users
-from controllers.notes_controller import notes
+from controllers.projects_controller import projects
 
 registerable_controllers = [
     auth,
     users,
-    notes
+    projects
 ]
