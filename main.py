@@ -40,8 +40,8 @@ def create_app():
         app.register_blueprint(controller)
     
     
-    @app.route('/')
-    def index():
-        return 'hello world'
+    # @app.route('/')
+    # def index():
+    #     return 'hello world'
     
     return app
