@@ -6,7 +6,7 @@ class Project(db.Model):
     
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-
+    tags = db.relationship('ProjectTag', back_populates='project')
 
 
     # comments = db.relationship(
