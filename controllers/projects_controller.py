@@ -1,12 +1,13 @@
-from flask import Blueprint, abort, request, jsonify
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from main import db
 
 from models.users import User
 from models.projects import Project
-from schemas.user_schema import user_schema, users_schema
+# from schemas.user_schema import user_schema, users_schema
 from schemas.project_schema import project_schema, projects_schema
+# from schemas.comment_schema import comment_schema, comments_schema
 
 
 projects = Blueprint("projects", __name__, url_prefix="/projects")
@@ -31,16 +32,28 @@ def get_project(id: int):
 
 
 @projects.route('/', methods=['POST'])
-@jwt_required() # planetary led to error without the parentheses
+# @jwt_required() # planetary led to error without the parentheses
 def create_project():
-    project_fields = project_schema.load(request.json)
-
+    project_fields = request.json
+    # print(request.json)
+    # print(project_fields)
     # extract id of user from the JWT token
-    request_id = get_jwt_identity()
+    # request_id = get_jwt_identity()
+    user_id = 3
     
+    title = project_fields['title']
+    description = project_fields['description']
+    github_url = project_fields['githubURL']
+    demo_url = project_fields['demoURL']
+    image_url = project_fields['imageURL']
+
     new_project = Project(
-        content=project_fields['content'],
-        user_id=request_id # link the new project to the correct user
+        title=title,
+        description=description,
+        github_url=github_url,
+        demo_url=demo_url,
+        image_url=image_url,
+        user_id=user_id # link the new project to the correct user
     )
     
     db.session.add(new_project)

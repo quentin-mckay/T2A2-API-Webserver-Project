@@ -2,7 +2,7 @@ from main import db
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String())
+    name = db.Column(db.String())
     
     # projects = db.relationship('ProjectTag', back_populates='tag')
     

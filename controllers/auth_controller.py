@@ -19,6 +19,7 @@ def register():
     # AND also validates (makes sure data is in expected format and free of errors)
     user_fields = user_schema.load(request.json)
     
+    
     # both of these are <class 'dict'>
     # print(type(request.json))
     # print(type(user_fields))
@@ -30,7 +31,7 @@ def register():
         print('Username already exists. Aborting.')
         
         # this is CA example
-        # return abort(400, description="Email alread registered") # sends Content-Type: text/html
+        # return abort(400, description="username alread registered") # sends Content-Type: text/html
         
         # planetary does following (sends json)
         return jsonify(message="That username already exists."), 409 # Conflict
@@ -47,7 +48,7 @@ def register():
     # print(new_user) # <User 5>
 
     expiry = timedelta(days=1)
-    access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
+    access_token = create_access_token(identity=str(new_user.id), expires_delta=expiry)
 
 
     # can't just jsonify(new_user)
@@ -64,15 +65,18 @@ def login():
     if request.is_json:
         user_fields = user_schema.load(request.json)
         # could then do ?
-        # email, password = user_fields.values()
+        # username, password = user_fields.values()
     else: # if it's a POST from a <form>
         user_fields = user_schema.load(request.form)
         
         
+    print(user_fields)
+        
+        
     # See if user already exists
-    user = User.query.filter_by(email=user_fields["email"]).first()
-    if not user:
-        return jsonify(message="You entered a bad email or password"), 401 # Permission Denied
+    user = User.query.filter_by(username=user_fields["username"]).first()
+    if not user or user.password != user_fields['password']:
+        return jsonify(message="You entered a bad username or password"), 401 # Permission Denied
         # CA does
         # return abort(401, description="Incorrect username and password")
         

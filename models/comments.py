@@ -5,7 +5,6 @@ class Comment(db.Model):
     message = db.Column(db.Text)
     
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"), nullable=False)
     
     def __repr__(self):

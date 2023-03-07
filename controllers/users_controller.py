@@ -7,6 +7,8 @@ from models.users import User
 from schemas.user_schema import user_schema, users_schema
 from schemas.project_schema import project_schema, projects_schema
 
+from schemas.tag_schema import tag_schema
+from schemas.comment_schema import comment_schema
 
 users = Blueprint("users", __name__, url_prefix="/users")
 
@@ -14,10 +16,8 @@ users = Blueprint("users", __name__, url_prefix="/users")
 @users.get("/")
 def get_users():
     users_list = User.query.all() # User.all() did not work (flask-marshmallow docs are wrong)
-    response = jsonify(users_schema.dump(users_list))
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
-    # return users_schema.dump(users_list) # 
+    return jsonify(users_schema.dump(users_list))
+    # response.headers.add('Access-Control-Allow-Origin', '*')
 
 
 @users.get('/<int:id>')

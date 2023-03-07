@@ -13,3 +13,6 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+
+
+# print('from user schema')

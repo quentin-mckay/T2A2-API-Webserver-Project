@@ -3,7 +3,7 @@ from models.comments import Comment
 from marshmallow import fields
 
 
-class CommentSchema(ma.Schema):
+class CommentSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         # ordered = True
         # Fields to expose. Card is not included as comments will be shown always attached to a Card.
@@ -15,3 +15,6 @@ class CommentSchema(ma.Schema):
 
 comment_schema = CommentSchema()
 comments_schema = CommentSchema(many=True)
+
+
+# print('from comment schema')

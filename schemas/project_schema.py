@@ -18,6 +18,12 @@ class ProjectSchema(ma.SQLAlchemyAutoSchema):
     
     # or use only to pick out the fields I want
     user = fields.Nested("UserSchema", only=("username", "id")) 
-        
+    tags = fields.List(fields.Nested("TagSchema"))
+    comments = fields.List(fields.Nested("CommentSchema"))
+    
+    
 project_schema = ProjectSchema()
 projects_schema = ProjectSchema(many=True)
+
+
+# print('from project schema')

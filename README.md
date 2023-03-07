@@ -26,6 +26,14 @@ Note model needed to be written and `flask db create` before adding relationship
 
 
 
+## Bugs
+
+1. circular dependency unless using "only" or "except"
+
+1. models not found because not imported into commands.py
+
+1. schemas don't seem to be "registered" and available for nesting in each other unless/until imported in a controller (I guess that 'runs' the schema file)
+
 
 
 
@@ -36,3 +44,5 @@ Add, Edit, or Delete
 
 ## Don't require login
 Listing planets and register new planet endpoint
+
+
