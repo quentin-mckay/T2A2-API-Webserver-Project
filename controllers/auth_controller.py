@@ -19,7 +19,6 @@ def register():
     # AND also validates (makes sure data is in expected format and free of errors)
     user_fields = user_schema.load(request.json)
     
-    
     # both of these are <class 'dict'>
     # print(type(request.json))
     # print(type(user_fields))
