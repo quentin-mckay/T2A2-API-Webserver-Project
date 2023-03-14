@@ -5,7 +5,7 @@ from models.users import User
 from schemas.user_schema import user_schema
 
 from datetime import timedelta
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 
 
@@ -53,7 +53,7 @@ def register():
     # can't just jsonify(new_user)
     # return user_schema.dump(new_user) # dump converts Python -> JSON (I don't need to wrap in jsonify())
     # planetary does
-    return jsonify(message="User registered successfully!", access_token=access_token), 201 # Created
+    return jsonify(message="User registered successfully!", token=access_token), 201 # Created
 
 
 
@@ -84,9 +84,20 @@ def login():
     access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
     
     # from planetary
-    return jsonify(message="Login succeeded!", access_token=access_token), 200
+    return jsonify(message="Login succeeded!", token=access_token, id=user.id), 200
 
-@auth.route('/test', methods=['POST'])
-def test():
-    print(request)
-    return jsonify(message= 'hello', access_token=1234)
+
+@auth.route('/token', methods=['POST'])
+@jwt_required()
+def authenticate_token():
+    user_id = get_jwt_identity()
+
+    user = User.query.get(user_id)
+    # print(user_id)
+    
+    return jsonify(id=user_id, username=user.username), 200
+
+# @auth.route('/test', methods=['POST'])
+# def test():
+#     print(request)
+#     return jsonify(message= 'hello', token=1234)

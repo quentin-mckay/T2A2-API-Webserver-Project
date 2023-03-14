@@ -11,24 +11,30 @@ from schemas.comment_schema import comment_schema, comments_schema
 
 comments = Blueprint("comments", __name__)
 
+# GET /posts/:postId/comments - Retrieve a list of all comments for a specific post.
+# GET /posts/:postId/comments/:id - Retrieve a specific comment for a specific post by ID.
+# POST /posts/:postId/comments - Create a new comment for a specific post.
+# PUT /posts/:postId/comments/:id - Update a specific comment for a specific post by ID.
+# DELETE /posts/:postId/comments/:id - Delete a specific comment for a specific post by ID.
 
 @comments.route('/projects/<int:project_id>/comments', methods=['GET'])
-def get_all_project_comments(project_id: int):
+def get_single_project_comments(project_id: int):
 	project = Project.query.filter_by(id=project_id).first()
-	
+ 
 	return jsonify(comments_schema.dump(project.comments))
 
 
 @comments.route('/projects/<int:project_id>/comments', methods=['POST'])
+@jwt_required()
 def create_comment(project_id: int):
-
- 
-	# user_id = get_jwt_identity()
-	user_id = 1
+	user_id = get_jwt_identity()
+	# user_id = 1
 	
-	project = Project.query.filter_by(id=project_id).first()
+	project = Project.query.filter_by(id=project_id).first() # or Project.query.get(project_id)
+	if not project:
+		return jsonify(message="Project not found"), 404 # Not Found
   
-	message = request.json['message']
+	message = request.json.get('message')
  
 	comment = Comment(
      	message=message, 
@@ -39,4 +45,4 @@ def create_comment(project_id: int):
 	db.session.add(comment)
 	db.session.commit()
  
-	return jsonify(message="Comment added")
+	return jsonify(message="Comment added", comment=comment_schema.dump(comment))

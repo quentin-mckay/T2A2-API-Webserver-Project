@@ -34,8 +34,8 @@ def seed():
 
     # password = bcrypt.generate_password_hash("123456").decode("utf-8")
     user1 = User(username = "Quentin", password = '5678', admin = True)
-    user2 = User(username = "Laura", password = 'ghjk')
-    user3 = User(username = "Tino", password = 'fgjthdf')
+    user2 = User(username = "Laura", password = 'asdf')
+    user3 = User(username = "Tino", password = 'zxcv')
     
     db.session.add_all([user1, user2, user3])
     db.session.commit() # This extra commit will end the transaction and generate the ids for the user
@@ -46,7 +46,7 @@ def seed():
         title="Syntax Highlighter",
         description="Syntax highlighter for code blocks in the Ed platform",
         github_url="https://github.com/quentin-mckay/Code-Syntax-Highlighter-Ed",
-        image_url="https://github.com/quentin-mckay/Code-Syntax-Highlighter-Ed/blob/master/images/screenshot.png",
+        image_url="https://c.tadst.com/gfx/600x337/rainbow.jpg?1",
         user=user1
     ) # user field comes from User model backref
     project2 = Project(
@@ -54,12 +54,14 @@ def seed():
         description="Create images from text",
         github_url="https://github.com/quentin-mckay/OpenAI-Image-Generator-React-Frontend",
         demo_url="https://openai-image-generator-react-frontend.onrender.com/",
-        image_url="https://github.com/quentin-mckay/OpenAI-Image-Generator-React-Flask/blob/master/app-image.jpg",
+        image_url="https://www.wwf.org.uk/sites/default/files/styles/social_share_image/public/2022-05/_WW236934.jpg?itok=wsulCklO",
         user=user1
     )
     project3 = Project(
         title="Third project",
+        description="Convert between binary, decimal, and hexidecimal bases using PyScript",
         github_url="https://github.com/quentin-mckay/Base-Converter-PyScript",
+        image_url="https://pyscript.net/assets/images/pyscript-sticker-black.svg",
         user=user2
     )
     

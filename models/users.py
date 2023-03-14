@@ -16,12 +16,14 @@ class User(db.Model):
         cascade="all, delete"
     )
     
-    
-    # comments = db.relationship(
-    #     "Comment",
-    #     backref="user",
-    #     cascade="all, delete"
-    # )
+    # does two things once user_id foreign key implemented on Comment model
+    # 1. allows user.comments
+    # 2. allows comment.user (and can embed user in comment schema ?)
+    comments = db.relationship(
+        "Comment",
+        backref="user",
+        cascade="all, delete"
+    )
     
     
     def __repr__(self):
