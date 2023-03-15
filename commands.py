@@ -1,6 +1,7 @@
 from flask import Blueprint
 
 from main import db
+from main import bcrypt
 
 from models.users import User
 from models.projects import Project
@@ -33,9 +34,9 @@ def seed():
     # db.session.add(admin_user)
 
     # password = bcrypt.generate_password_hash("123456").decode("utf-8")
-    user1 = User(username = "Quentin", password = '5678', admin = True)
-    user2 = User(username = "Laura", password = 'asdf')
-    user3 = User(username = "Tino", password = 'zxcv')
+    user1 = User(username = "Quentin", password = bcrypt.generate_password_hash("qwer").decode("utf-8"), admin = True)
+    user2 = User(username = "Laura", password = bcrypt.generate_password_hash("asdf").decode("utf-8"))
+    user3 = User(username = "Tino", password = bcrypt.generate_password_hash("zxcv").decode("utf-8"))
     
     db.session.add_all([user1, user2, user3])
     db.session.commit() # This extra commit will end the transaction and generate the ids for the user
@@ -92,7 +93,7 @@ def seed():
     db.session.commit()
 
 
-    print("Tables seeded")
+    
 
 
 
@@ -113,3 +114,4 @@ def drop_db():
     print("Tables created")
     
     seed()
+    print("Tables seeded")

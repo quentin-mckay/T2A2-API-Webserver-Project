@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request, abort
 from main import db
 
+from main import bcrypt
+
 from models.users import User
 from schemas.user_schema import user_schema
 
@@ -15,6 +17,7 @@ auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth.route('/register', methods=['POST'])
 def register():
+    '''Create new user'''
     # load() converts from serialized format (JSON) to python dict 
     # AND also validates (makes sure data is in expected format and free of errors)
     user_fields = user_schema.load(request.json)
@@ -35,9 +38,12 @@ def register():
         # planetary does following (sends json)
         return jsonify(message="That username already exists."), 409 # Conflict
 
+
+    encrypted_password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
+
     new_user = User(
         username=user_fields['username'],
-        password=user_fields['password']
+        password=encrypted_password
     )
     
     db.session.add(new_user)
@@ -59,7 +65,7 @@ def register():
 
 @auth.route("/login", methods=['POST'])
 def login():
-    
+    '''Login user using username and password'''
     # Extract POST data
     if request.is_json:
         user_fields = user_schema.load(request.json)
@@ -74,11 +80,15 @@ def login():
         
     # See if user already exists
     user = User.query.filter_by(username=user_fields["username"]).first()
-    if not user or user.password != user_fields['password']:
-        return jsonify(message="You entered a bad username or password"), 401 # Permission Denied
+    
+    if not user:
+        return jsonify(message="You entered an invalid username"), 401 # Permission Denied
         # CA does
         # return abort(401, description="Incorrect username and password")
         
+    if not bcrypt.check_password_hash(user.password, user_fields["password"]):
+        return jsonify(message="You entered an invalid password"), 401 # Permission Denied
+    
     
     expiry = timedelta(days=1)
     access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
@@ -90,6 +100,8 @@ def login():
 @auth.route('/token', methods=['POST'])
 @jwt_required()
 def authenticate_token():
+    '''Check JWT is valid and return user id and name. Used for logging in automatically when the app first loads'''
+    
     user_id = get_jwt_identity()
 
     user = User.query.get(user_id)
