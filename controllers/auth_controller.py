@@ -26,21 +26,25 @@ def register():
     # print(type(request.json))
     # print(type(user_fields))
     
-    username = user_fields['username']
+    username = user_fields.get('username')
+    
+    # Database query
+    # Get the first User which has a username property equal to *username*
     user = User.query.filter_by(username=username).first() # returns None if didn't find anything
     
     if user:
         print('Username already exists. Aborting.')
         
-        # this is CA example
+        # CA example
         # return abort(400, description="username alread registered") # sends Content-Type: text/html
         
-        # planetary does following (sends json)
         return jsonify(message="That username already exists."), 409 # Conflict
 
 
+    # Encyrpt password
     encrypted_password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
 
+    # Create and add new User to database
     new_user = User(
         username=user_fields['username'],
         password=encrypted_password
@@ -49,23 +53,20 @@ def register():
     db.session.add(new_user)
     db.session.commit()
     
-    # print(type(new_user)) # <class 'models.users.User'>
-    # print(new_user) # <User 5>
-
+    # Create new JWT
     expiry = timedelta(days=1)
     access_token = create_access_token(identity=str(new_user.id), expires_delta=expiry)
 
 
     # can't just jsonify(new_user)
     # return user_schema.dump(new_user) # dump converts Python -> JSON (I don't need to wrap in jsonify())
-    # planetary does
     return jsonify(message="User registered successfully!", token=access_token), 201 # Created
 
 
 
 @auth.route("/login", methods=['POST'])
 def login():
-    '''Login user using username and password'''
+    '''Log in a user using username and password'''
     # Extract POST data
     if request.is_json:
         user_fields = user_schema.load(request.json)
@@ -74,26 +75,28 @@ def login():
     else: # if it's a POST from a <form>
         user_fields = user_schema.load(request.form)
         
-        
-    print(user_fields)
-        
-        
-    # See if user already exists
-    user = User.query.filter_by(username=user_fields["username"]).first()
     
+    username = user_fields.get('username')
+    
+    # Database query
+    # Get the first User which has a username property equal to *username*
+    user = User.query.filter_by(username=username).first()
+    
+    # Check if user exists
     if not user:
         return jsonify(message="You entered an invalid username"), 401 # Permission Denied
         # CA does
         # return abort(401, description="Incorrect username and password")
         
+    # Check if sent password matches user password
     if not bcrypt.check_password_hash(user.password, user_fields["password"]):
         return jsonify(message="You entered an invalid password"), 401 # Permission Denied
     
-    
+    # Create new JWT
     expiry = timedelta(days=1)
     access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
     
-    # from planetary
+    
     return jsonify(message="Login succeeded!", token=access_token, id=user.id), 200
 
 
@@ -102,14 +105,11 @@ def login():
 def authenticate_token():
     '''Check JWT is valid and return user id and name. Used for logging in automatically when the app first loads'''
     
+    # Extract user id from JWT
     user_id = get_jwt_identity()
 
+    # Database query
+    # Get the User by it's primary key, the ID
     user = User.query.get(user_id)
-    # print(user_id)
     
     return jsonify(id=user_id, username=user.username), 200
-
-# @auth.route('/test', methods=['POST'])
-# def test():
-#     print(request)
-#     return jsonify(message= 'hello', token=1234)

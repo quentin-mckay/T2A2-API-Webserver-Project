@@ -10,38 +10,55 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 openai_bp = Blueprint('openai', __name__, url_prefix='/openai')
 
 
-suffix = [
-    'pixel art',
-    'digital art',
-    # 'one-line drawing',
-    # 'synthwave',
-    # 'by Picasso'
-]
-
 
 @openai_bp.post('/description')
 def generate_description():
-    print(request.json)
-    description = 'hello'
+    '''Generate a description of a GitHub repository using OpenAI'''
+
     
-    repository_url = request.json['githubURL']
+    repository_url = request.json.get('githubURL')
     
-    prompt = f"Give a short description of the following github repository: {repository_url}. Don't mention the github repository in the description"
-    #  or start the description with the word 'This'.
+    # prompt = f"Give a short description of the following github repository: {repository_url}. User 20 words or less. Don't mention the github repository in the description."
     
+    prompt = f"Give a detailed description of the following github repository: {repository_url}. Don't mention the github repository in the description. Explain how the code works and briefly describe the relevent web technologies used. Don't use the words 'project' or 'repository' in the description."
+    
+    description = ''
+    
+    # Query OpenAI to generate description
     try:
-        # response = openai.Completion.create(
-		# 	model='text-davinci-003',
-		# 	prompt=prompt,
-		# 	temperature=0.6,
-		# 	max_tokens=1024
-		# )
+        description = get_openai_response(prompt)
+    except Exception as err:
+        print(err)
         
-        # description = response.choices[0].text
-        # description = description.strip()
-        description = get_chatgpt_response(prompt)
+    # Clean up description
+    description = description.replace("This is a", "A")
+    # description = description.replace("This repository ", "")
+    # description = description.capitalize()
+    
+    
+    return jsonify(description=description), 200 # OK
+    
+    
+    
+@openai_bp.post('/image_prompt')
+def generate_image_prompt():
+    '''Generate an image prompt for a GitHub repository'''
+    
+    github_url = request.json.get('githubURL')
+
+    # Query OpenAI to generate prompt
+    try:
+        openai_response = get_openai_response(f"Summarize the following repository in one word: {github_url}")
+        # openai_response = get_openai_response(f"In one sentence, describe the contents of a picture that represents the following github repository: {github_url}. Don't say 'The picture depicts' or 'In this picture' or make any mention of the picture itself.")
         
-        return jsonify(description=description), 200 # OK
+        suffix = choice([
+            'pixel art',
+            'digital art',
+        ])
+
+        image_prompt = f"An abstract illustration of {openai_response}, {suffix}"
+        
+        return jsonify(image_prompt=image_prompt), 200 # OK
     
     except Exception as err:
         print(err)
@@ -51,20 +68,11 @@ def generate_description():
 
 @openai_bp.post('/image')
 def generate_image():
-    # print(request.json)
-    
-    github_url = request.json.get('githubURL')
+    '''Generate an image using OpenAI Dall-E'''
 
-    chat_gpt_response = get_chatgpt_response(f"Summarize the following repository in one word: {github_url}")
-    # chat_gpt_response = get_chatgpt_response(f"In one sentence, describe the contents of a picture that represents the following github repository: {github_url}. Don't say 'The picture depicts' or 'In this picture' or make any mention of the picture itself.")
-    
-    print('ChatGPT response: ', chat_gpt_response)
+    image_prompt = request.json.get('imagePrompt')
 
-    image_prompt = f"An abstract illustration of {chat_gpt_response}, digital art"
-    # image_prompt = f"{chat_gpt_response}, digital art"
-
-    print(image_prompt)
-    
+    # Query OpenAI to generate image
     try:
         response = openai.Image.create(
 			prompt=image_prompt,
@@ -81,11 +89,11 @@ def generate_image():
         print(err)
         return jsonify(message=err), 500 # Internal Server Error
     
-    
-    # return {}
-    
 
-def get_chatgpt_response(prompt):
+
+def get_openai_response(prompt):
+    '''Query the OpenAI text-completion language model using a input prompt'''
+
     response = openai.Completion.create(
         model='text-davinci-003',
         prompt=prompt,

@@ -105,7 +105,7 @@ def drop_db():
     
     
 @db_commands.cli.command('reset')
-def drop_db():
+def reset_db():
     
     db.drop_all()
     print("Tables dropped")

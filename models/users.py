@@ -6,9 +6,6 @@ class User(db.Model):
     password = db.Column(db.String(), nullable=False)
     admin = db.Column(db.Boolean(), default=False)
     
-    # backref='user' creates column in the Project model used for querying
-	# ex: quentin = User(username="Quentin", password="1234")
-    # ex: project = Project(content="I am a project", owner=quentin)
     projects = db.relationship(
         'Project', 
         backref='user', 
@@ -16,15 +13,19 @@ class User(db.Model):
         cascade="all, delete"
     )
     
-    # does two things once user_id foreign key implemented on Comment model
-    # 1. allows user.comments
-    # 2. allows comment.user (and can embed user in comment schema ?)
     comments = db.relationship(
         "Comment",
         backref="user",
         cascade="all, delete"
     )
+    # backref='user' creates column in the Project model used for querying
+	# ex: quentin = User(username="Quentin", password="1234")
+    # ex: project = Project(content="I am a project", owner=quentin)
+    
+    # does two things once user_id foreign key implemented on Comment model
+    # 1. allows user.comments
+    # 2. allows comment.user (and can embed user in comment schema ?)
     
     
     def __repr__(self):
-        return f'<User {self.id} {self.email}>'
+        return f'<User {self.id} {self.username}>'

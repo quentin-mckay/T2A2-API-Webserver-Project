@@ -19,23 +19,31 @@ comments = Blueprint("comments", __name__)
 
 @comments.route('/projects/<int:project_id>/comments', methods=['GET'])
 def get_single_project_comments(project_id: int):
-	project = Project.query.filter_by(id=project_id).first()
- 
-	return jsonify(comments_schema.dump(project.comments))
+    '''Get a project's comments'''
+    
+    # Database query
+    # Get the first Project which has a id property equal to *project_id*
+    project = Project.query.filter_by(id=project_id).first()
+    
+    return jsonify(comments_schema.dump(project.comments))
 
 
 @comments.route('/projects/<int:project_id>/comments', methods=['POST'])
 @jwt_required()
 def create_comment(project_id: int):
 	user_id = get_jwt_identity()
-	# user_id = 1
 	
+	# Database query
+    # Get the first Project which has a id property equal to *project_id*
 	project = Project.query.filter_by(id=project_id).first() # or Project.query.get(project_id)
+ 
+	# Check if project exists
 	if not project:
 		return jsonify(message="Project not found"), 404 # Not Found
   
 	message = request.json.get('message')
  
+	# Create comment and add to database
 	comment = Comment(
      	message=message, 
 		user_id=user_id,
