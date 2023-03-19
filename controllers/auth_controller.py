@@ -1,13 +1,13 @@
-from flask import Blueprint, jsonify, request, abort
-from main import db
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
+from main import db
 from main import bcrypt
 
 from models.users import User
 from schemas.user_schema import user_schema
 
 from datetime import timedelta
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 
 
@@ -18,30 +18,19 @@ auth = Blueprint('auth', __name__, url_prefix='/auth')
 @auth.route('/register', methods=['POST'])
 def register():
     '''Create new user'''
-    # load() converts from serialized format (JSON) to python dict 
-    # AND also validates (makes sure data is in expected format and free of errors)
-    user_fields = user_schema.load(request.json)
     
-    # both of these are <class 'dict'>
-    # print(type(request.json))
-    # print(type(user_fields))
+    user_fields = user_schema.load(request.json)
     
     username = user_fields.get('username')
     
     # Database query
     # Get the first User which has a username property equal to *username*
-    user = User.query.filter_by(username=username).first() # returns None if didn't find anything
+    user = User.query.filter_by(username=username).first()
     
     if user:
-        print('Username already exists. Aborting.')
-        
-        # CA example
-        # return abort(400, description="username alread registered") # sends Content-Type: text/html
-        
         return jsonify(message="That username already exists."), 409 # Conflict
 
-
-    # Encyrpt password
+    # Encrypt password
     encrypted_password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
 
     # Create and add new User to database
@@ -57,9 +46,6 @@ def register():
     expiry = timedelta(days=1)
     access_token = create_access_token(identity=str(new_user.id), expires_delta=expiry)
 
-
-    # can't just jsonify(new_user)
-    # return user_schema.dump(new_user) # dump converts Python -> JSON (I don't need to wrap in jsonify())
     return jsonify(message="User registered successfully!", token=access_token), 201 # Created
 
 
@@ -67,11 +53,10 @@ def register():
 @auth.route("/login", methods=['POST'])
 def login():
     '''Log in a user using username and password'''
-    # Extract POST data
+
     if request.is_json:
         user_fields = user_schema.load(request.json)
-        # could then do ?
-        # username, password = user_fields.values()
+    
     else: # if it's a POST from a <form>
         user_fields = user_schema.load(request.form)
         

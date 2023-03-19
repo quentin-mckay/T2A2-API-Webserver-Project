@@ -9,16 +9,16 @@ from models.tags import Tag
 from schemas.project_schema import project_schema, projects_schema
 
 import os
+
 import cloudinary
 import cloudinary.uploader
 
-
-# Cloudinary setup
 cloudinary.config(
     cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME"),
     api_key = os.environ.get("CLOUDINARY_API_KEY"),
     api_secret = os.environ.get("CLOUDINARY_API_SECRET")
 )
+
 
 
 projects = Blueprint("projects", __name__, url_prefix="/projects")
@@ -43,8 +43,7 @@ def get_project_by_id(project_id: int):
     
     # Database query
     # Get the Project by it's primary key, the ID
-    project = Project.query.get(project_id) # shorthand for querying by primary_key
-    # project = Project.query.filter_by(id=project_id).first() # alternative way
+    project = Project.query.get(project_id)
     
     # Check if project exists
     if not project:
@@ -55,28 +54,21 @@ def get_project_by_id(project_id: int):
 
 
 @projects.route('/', methods=['POST'])
-@jwt_required() # planectary led to error without the parentheses
+@jwt_required()
 def create_project():
     '''Create a new project'''
-    project_fields = request.json
-    # project_fields = project_schema.load(request.json)
+
+    project_fields = project_schema.load(request.json)
     
-    # print(request.json)
-    
-    # extract id of user from the JWT token
+    # Extract id of user from the JWT token
     user_id = get_jwt_identity()
-    
     
     title = project_fields.get('title')
     description = project_fields.get('description')
-    github_url = project_fields.get('githubURL')
-    demo_url = project_fields.get('demoURL')
-    # image_url = project_fields.get('imageURL')
+    github_url = project_fields.get('github_url')
+    demo_url = project_fields.get('demo_url')
     image_url = ''
-    
-    # print('Tags: ', project_fields.get('tags'))
     tags = project_fields.get('tags')
-
 
     try:
         image = project_fields.get('image')
@@ -84,11 +76,7 @@ def create_project():
         # Upload image to Cloudinary
         if image:
             response = cloudinary.uploader.upload(image, folder='projectshare')
-            # print('Image: yes')
             image_url = response.get('url')
-        else:
-            print('Image: no')
-
 
         # Create a new project
         new_project = Project(
@@ -97,13 +85,12 @@ def create_project():
             github_url=github_url,
             demo_url=demo_url,
             image_url=image_url,
-            user_id=user_id, # link the new project to the correct user,
-            # tags=tags (this doesn't work. must do it manually like below)
+            user_id=user_id,
         )
         
         # Add tags to the project
         for tag in tags:
-            new_tag = Tag(name=tag)
+            new_tag = Tag(name=tag['name'])
             new_project.tags.append(new_tag)
         
         # Add project to the database
@@ -121,22 +108,14 @@ def create_project():
 @jwt_required()
 def update_project(project_id: int):
     '''Update a project by its ID'''
-    # project_fields = project_schema.load(request.json)
-    project_fields = request.json
-    # print(project_fields)
+
+    project_fields = project_schema.load(request.json)
 
     user_id = get_jwt_identity()
-    
-    # CA examples
-    # user = User.query.get(user_id)
-    # if not user:
-    #     return abort(401, message="Invalid user")
-
 
     # Database query
     # Get the Project by its primary key, the ID
     project = Project.query.get(project_id)
-    
     
     # Check if project exits
     if not project:
@@ -152,17 +131,17 @@ def update_project(project_id: int):
         # Create project and add 
         project.title = project_fields.get('title')
         project.description = project_fields.get('description')
-        project.github_url = project_fields.get('githubURL')
-        project.demo_url = project_fields.get('demoURL')
+        project.github_url = project_fields.get('github_url')
+        project.demo_url = project_fields.get('demo_url')
         # project.image_url = project_fields.get('imageURL')
     
-        # replace tag list
-        project.tags = [Tag(name=name) for name in project_fields.get('tags')]
+        # List comprehension
+        project.tags = [Tag(name=tag['name']) for tag in project_fields.get('tags')]
         
         db.session.commit()
         
         return jsonify(message="Updated project", project=project_schema.dump(project)), 202 # Accepted
-    except:
+    except Exception as e:
         return jsonify(message="Error while creating new Project"), 500 # Internal Server Error
 
 
@@ -171,6 +150,7 @@ def update_project(project_id: int):
 @jwt_required()
 def delete_project(project_id: int):
     '''Delete a project by its ID'''
+
     user_id = get_jwt_identity()
     
     # Database query
@@ -184,15 +164,13 @@ def delete_project(project_id: int):
     # Get the Project by its primary key, the ID
     project = Project.query.get(project_id)
     
-    # print('project username and id:', project.user.username, project.user_id)
-    
     # Check the project exists
     if not project:
         return jsonify(message="Project does not exist"), 404 # Not Found
     
     # Check if used ID from JWT matches project's user ID
-    if user_id != project.user_id:
-        
+    if int(user_id) != project.user.id:
+        print('here')
         return jsonify(message="Unauthorized user"), 401 # Unauthorized (abort send backs html)
     
     # Delete the project
@@ -206,10 +184,9 @@ def delete_project(project_id: int):
 @projects.route('/tag', methods=['GET'])
 def get_projects_by_tag_name():
     '''Get all projects that contain a specific tag in their tags list'''
+    
     tag_name = request.args.get('tag')
 
-    # projects = Project.query.filter(Project.tags.any(tag_name)).all() (not working)
-    
     # Database query
     # Join the Project model with the Tag model via the project_tags table.
     # The project_tags table is passed to the *secondary* parameter of the relationship method in the Project model

@@ -9,7 +9,9 @@ from models.comments import Comment
 from models.tags import Tag
 
 
+
 db_commands = Blueprint("db", __name__)
+
 
 
 @db_commands.cli.command("create")
@@ -18,38 +20,31 @@ def create_db():
 	print("Tables created")
  
  
-
+ 
 @db_commands.cli.command("seed")
 def seed_db():
     seed()
 
-def seed():
-    #Create the users first
-    # admin_user = User(
-    #     email = "admin@email.com",
-    #     # password = bcrypt.generate_password_hash("password123").decode("utf-8"),
-    #     password = '1234',
-    #     admin = True
-    # )
-    # db.session.add(admin_user)
 
-    # password = bcrypt.generate_password_hash("123456").decode("utf-8")
+
+def seed():
+    # Create Users
     user1 = User(username = "Quentin", password = bcrypt.generate_password_hash("qwer").decode("utf-8"), admin = True)
     user2 = User(username = "Laura", password = bcrypt.generate_password_hash("asdf").decode("utf-8"))
     user3 = User(username = "Tino", password = bcrypt.generate_password_hash("zxcv").decode("utf-8"))
     
     db.session.add_all([user1, user2, user3])
-    db.session.commit() # This extra commit will end the transaction and generate the ids for the user
+    db.session.commit()
     
     
-    
+    # Create Projects
     project1 = Project(
         title="Syntax Highlighter",
         description="Syntax highlighter for code blocks in the Ed platform",
         github_url="https://github.com/quentin-mckay/Code-Syntax-Highlighter-Ed",
         image_url="https://c.tadst.com/gfx/600x337/rainbow.jpg?1",
         user=user1
-    ) # user field comes from User model backref
+    )
     project2 = Project(
         title="Text-to-Image Generator",
         description="Create images from text",
@@ -70,7 +65,7 @@ def seed():
     db.session.commit()
 
 
-
+    # Create Comments
     comment1 = Comment(message='Comment for the first project', user_id=2, project=project1) # project field from backref defined in Project model
     comment2 = Comment(message='Comment for the second project', user_id=3, project=project2)
     comment3 = Comment(message='Another comment for the second project', user_id=3, project=project2)
@@ -80,6 +75,7 @@ def seed():
     db.session.commit()
 
 
+    # Create Tags
     tag1 = Tag(name='React')
     tag2 = Tag(name='Tailwind')
     tag3 = Tag(name='Flask')
@@ -93,20 +89,18 @@ def seed():
     db.session.commit()
 
 
-    
-
-
-
 
 @db_commands.cli.command('drop')
 def drop_db():
     db.drop_all()
     print("Tables dropped")
     
-    
+
+
 @db_commands.cli.command('reset')
 def reset_db():
-    
+    '''Reset the entire database'''
+
     db.drop_all()
     print("Tables dropped")
     

@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify
 
 import openai
+
 import os
 from random import choice
 
 openai.api_key = os.environ.get("OPENAI_API_KEY")
+
 
 
 openai_bp = Blueprint('openai', __name__, url_prefix='/openai')
@@ -15,10 +17,7 @@ openai_bp = Blueprint('openai', __name__, url_prefix='/openai')
 def generate_description():
     '''Generate a description of a GitHub repository using OpenAI'''
 
-    
     repository_url = request.json.get('githubURL')
-    
-    # prompt = f"Give a short description of the following github repository: {repository_url}. User 20 words or less. Don't mention the github repository in the description."
     
     prompt = f"Give a detailed description of the following github repository: {repository_url}. Don't mention the github repository in the description. Explain how the code works and briefly describe the relevent web technologies used. Don't use the words 'project' or 'repository' in the description."
     
@@ -30,11 +29,8 @@ def generate_description():
     except Exception as err:
         print(err)
         
-    # Clean up description
+    # Clean up description edge case
     description = description.replace("This is a", "A")
-    # description = description.replace("This repository ", "")
-    # description = description.capitalize()
-    
     
     return jsonify(description=description), 200 # OK
     
@@ -49,7 +45,6 @@ def generate_image_prompt():
     # Query OpenAI to generate prompt
     try:
         openai_response = get_openai_response(f"Summarize the following repository in one word: {github_url}")
-        # openai_response = get_openai_response(f"In one sentence, describe the contents of a picture that represents the following github repository: {github_url}. Don't say 'The picture depicts' or 'In this picture' or make any mention of the picture itself.")
         
         suffix = choice([
             'pixel art',
@@ -102,26 +97,3 @@ def get_openai_response(prompt):
     )
     
     return response.choices[0].text.strip()
-    
-    
-
-
-# @openai_bp.post('/tags')
-# def generate_tags():
-#     print(request.json)
-#     description = 'hello'
-    
-#     repository_url = request.json['githubURL']
-    
-#     prompt = f'What are the primary web technologies used by the following github repository: #{repository_url}'
-    
-#     response = openai.Completion.create(
-# 		model='text-davinci-003',
-# 		prompt=prompt,
-# 		temperature=0.6,
-# 		max_tokens=1024
-# 	)
-    
-#     description = response.choices[0].text
-    
-#     return jsonify(description=description), 200

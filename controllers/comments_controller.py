@@ -1,21 +1,17 @@
 from flask import Blueprint, request, jsonify
+
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from main import db
 
 from models.projects import Project
 from models.comments import Comment
-
 from schemas.comment_schema import comment_schema, comments_schema
 
 
 comments = Blueprint("comments", __name__)
 
-# GET /posts/:postId/comments - Retrieve a list of all comments for a specific post.
-# GET /posts/:postId/comments/:id - Retrieve a specific comment for a specific post by ID.
-# POST /posts/:postId/comments - Create a new comment for a specific post.
-# PUT /posts/:postId/comments/:id - Update a specific comment for a specific post by ID.
-# DELETE /posts/:postId/comments/:id - Delete a specific comment for a specific post by ID.
+
 
 @comments.route('/projects/<int:project_id>/comments', methods=['GET'])
 def get_single_project_comments(project_id: int):
