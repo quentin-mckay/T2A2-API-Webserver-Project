@@ -1,5 +1,9 @@
 # ProjectShare Backend Flask API 
 
+## Usage
+
+`flask run`
+
 ## Database info
 
 - Database name: **projectshare**
